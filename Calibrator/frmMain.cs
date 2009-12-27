@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Diagnostics;
 using usbSimInstrument;
 using LibUsbDotNet;
 using LibUsbDotNet.DeviceNotify;
@@ -48,6 +49,10 @@ namespace Calibrator
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            textBoxPointer1Min.Text = hScrollBarSet1_1.Minimum.ToString();
+            textBoxPointer1Max.Text = hScrollBarSet1_1.Maximum.ToString();
+            textBoxPointer2Min.Text = hScrollBarSet2_1.Minimum.ToString();
+            textBoxPointer2Max.Text = hScrollBarSet2_1.Maximum.ToString();
             DeviceNotifier.OnDeviceNotify += OnDeviceNotifyEvent;
             FindDevices();
         }
@@ -106,7 +111,7 @@ namespace Calibrator
                 labelSet1_2Value.Text = raw[1].ToString();
 
                 textBoxSet1_3.Text = table[2].ToString();
-                hScrollBarSet3.Value = raw[2];
+                hScrollBarSet1_3.Value = raw[2];
                 labelSet1_3Value.Text = raw[2].ToString();
 
                 textBoxSet1_4.Text = table[3].ToString();
@@ -114,7 +119,7 @@ namespace Calibrator
                 labelSet1_4Value.Text = raw[3].ToString();
 
                 textBoxSet1_5.Text = table[4].ToString();
-                hScrollBarSet5.Value = raw[4];
+                hScrollBarSet1_5.Value = raw[4];
                 labelSet1_5Value.Text = raw[4].ToString();
 
                 textBoxSet1_6.Text = table[5].ToString();
@@ -122,7 +127,7 @@ namespace Calibrator
                 labelSet1_6Value.Text = raw[5].ToString();
 
                 textBoxSet1_7.Text = table[6].ToString();
-                hScrollBarSet7.Value = raw[6];
+                hScrollBarSet1_7.Value = raw[6];
                 labelSet1_7Value.Text = raw[6].ToString();
 
                 textBoxSet1_8.Text = table[7].ToString();
@@ -153,11 +158,11 @@ namespace Calibrator
 
         private void hScrollBarSet1_3_Scroll(object sender, ScrollEventArgs e)
         {
-            labelSet1_3Value.Text = hScrollBarSet3.Value.ToString();
+            labelSet1_3Value.Text = hScrollBarSet1_3.Value.ToString();
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet3.Value);
+                Instrument.Set1(hScrollBarSet1_3.Value);
             }
         }
 
@@ -172,11 +177,11 @@ namespace Calibrator
         }
         private void hScrollBarSet1_5_Scroll(object sender, ScrollEventArgs e)
         {
-            labelSet1_5Value.Text = hScrollBarSet5.Value.ToString();
+            labelSet1_5Value.Text = hScrollBarSet1_5.Value.ToString();
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet5.Value);
+                Instrument.Set1(hScrollBarSet1_5.Value);
             }
         }
 
@@ -192,11 +197,11 @@ namespace Calibrator
 
         private void hScrollBarSet1_7_Scroll(object sender, ScrollEventArgs e)
         {
-            labelSet1_7Value.Text = hScrollBarSet7.Value.ToString();
+            labelSet1_7Value.Text = hScrollBarSet1_7.Value.ToString();
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet7.Value);
+                Instrument.Set1(hScrollBarSet1_7.Value);
             }
         }
 
@@ -303,25 +308,69 @@ namespace Calibrator
                 raw[1] = double.Parse(hScrollBarSet1_2.Value.ToString());
 
                 table[2] = double.Parse(textBoxSet1_3.Text.ToString());
-                raw[2] = double.Parse(hScrollBarSet3.Value.ToString());
+                raw[2] = double.Parse(hScrollBarSet1_3.Value.ToString());
 
                 table[3] = double.Parse(textBoxSet1_4.Text.ToString());
                 raw[3] = double.Parse(hScrollBarSet1_4.Value.ToString());
 
                 table[4] = double.Parse(textBoxSet1_5.Text.ToString());
-                raw[4] = double.Parse(hScrollBarSet5.Value.ToString());
+                raw[4] = double.Parse(hScrollBarSet1_5.Value.ToString());
 
                 table[5] = double.Parse(textBoxSet1_6.Text.ToString());
                 raw[5] = double.Parse(hScrollBarSet1_6.Value.ToString());
 
                 table[6] = double.Parse(textBoxSet1_7.Text.ToString());
-                raw[6] = double.Parse(hScrollBarSet7.Value.ToString());
+                raw[6] = double.Parse(hScrollBarSet1_7.Value.ToString());
 
                 table[7] = double.Parse(textBoxSet1_8.Text.ToString());
                 raw[7] = double.Parse(hScrollBarSet1_8.Value.ToString());
 
                 Instrument.writeTable(table);
                 Instrument.writeTableRaw(raw);
+            }
+        }
+
+        private void buttonPointer1MinMaxSet_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                hScrollBarSet1_1.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_1.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_2.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_2.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_3.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_3.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_4.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_4.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_5.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_5.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_6.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_6.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_7.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_7.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet1_8.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet1_8.Maximum = int.Parse(textBoxPointer1Max.Text);
+
+                hScrollBarSet2_1.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_1.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_2.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_2.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_3.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_3.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_4.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_4.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_5.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_5.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_6.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_6.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_7.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_7.Maximum = int.Parse(textBoxPointer1Max.Text);
+                hScrollBarSet2_8.Minimum = int.Parse(textBoxPointer1Min.Text);
+                hScrollBarSet2_8.Maximum = int.Parse(textBoxPointer1Max.Text);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: " + ex.Message);
             }
         }
     }
