@@ -20,9 +20,23 @@ namespace usbSimInstrument
             ECHO = 0,
             SET1 = 1,
             SET2 = 2,
-            GET_TABLE = 3,
-            SET_TABLE = 4,
-            RESET = 9,
+            GET_TABLE = 10,
+            SET_TABLE = 11,
+            GET_TABLE_RAW = 20,
+            SET_TABLE_RAW = 21,
+            GET_TABLE2 = 30,
+            SET_TABLE2 = 31,
+            GET_TABLE_RAW2 = 40,
+            SET_TABLE_RAW2 = 41,
+            RESET = 99,
+        };
+
+        internal enum USBSIM_TABLE_TYPES
+        {
+            TABLE,
+            TABLE_RAW,
+            TABLE2,
+            TABLE_RAW2,
         };
 
         public Instrument(String serial)
@@ -42,17 +56,38 @@ namespace usbSimInstrument
             }
         }
 
-        public bool Set1(int val)
+        private bool SetHelper(byte pointer, int val)
         {
             if (usbInstrumentDevice.Open())
             {
                 int lengthTransferred;
                 byte[] buf = new byte[1];
+                UsbSetupPacket cmd = new UsbSetupPacket();
 
-                UsbSetupPacket cmd = UsbCmdSet1;
-                cmd.Value = (short)val;
-                bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
-                return bSuccess && lengthTransferred == 1;
+                switch (pointer)
+                {
+                    case 1:
+                        cmd = UsbCmdSet1;
+                        break;
+                    case 2:
+                        cmd = UsbCmdSet2;
+                        break;
+                    default:
+                        cmd.RequestType = UsbRequestType.RecipOther;
+                        break;
+                }
+
+                if (cmd.RequestType != UsbRequestType.RecipOther)
+                {
+
+                    cmd.Value = (short)val;
+                    bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
+                    return bSuccess && lengthTransferred == 1;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
@@ -60,56 +95,164 @@ namespace usbSimInstrument
             }
         }
 
-        public double ReadTable(int addr)
+        public bool Set1(int val)
         {
+            return SetHelper(1, val);
+        }
+
+        public bool Set2(int val)
+        {
+            return SetHelper(2, val);
+        }
+
+        private double[] ReadTableHelper(USBSIM_TABLE_TYPES type)
+        {
+            double[] table = new double[8];
+
             if (usbInstrumentDevice.Open())
             {
                 int lengthTransferred;
                 byte[] buf = new byte[8];
+                UsbSetupPacket cmd = new UsbSetupPacket();
 
-                UsbSetupPacket cmd = UsbCmdReadTable;
-                cmd.Value = (short)addr;
-                if (usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred))
+                switch (type)
                 {
-                    return BitConverter.ToDouble(buf, 0);
+                    case USBSIM_TABLE_TYPES.TABLE:
+                        cmd = UsbCmdReadTable;
+                        break;
+                    case USBSIM_TABLE_TYPES.TABLE2:
+                        cmd = UsbCmdReadTable2;
+                        break;
+                    case USBSIM_TABLE_TYPES.TABLE_RAW:
+                        cmd = UsbCmdReadTableRaw;
+                        break;
+                    case USBSIM_TABLE_TYPES.TABLE_RAW2:
+                        cmd = UsbCmdReadTableRaw2;
+                        break;
+                    default:
+                        cmd.RequestType = UsbRequestType.RecipOther;
+                        break;
                 }
-                else
+
+                if (cmd.RequestType != UsbRequestType.RecipOther)
                 {
-                    return 0;
+
+                    for (short i = 0; i < 8; i++)
+                    {
+                        cmd.Value = i;
+                        if (usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred))
+                        {
+                            table[i] = BitConverter.ToDouble(buf, 0);
+                        }
+                        else
+                        {
+                            table[i] = 0;
+                        }
+                    }
                 }
             }
-            else
-            {
-                return 0;
-            }
+
+            return table;
         }
 
-        public bool WriteTable(int addr, double val)
+        public double[] ReadTable()
+        {
+            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE);
+        }
+
+        public double[] ReadTable2()
+        {
+            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE2);
+        }
+
+        public double[] ReadTableRaw()
+        {
+            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW);
+        }
+
+        public double[] ReadTableRaw2()
+        {
+            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW2);
+        }
+
+        private bool WriteTableHelper(USBSIM_TABLE_TYPES type, double[] values)
         {
             if (usbInstrumentDevice.Open())
             {
                 int lengthTransferred;
                 byte[] buf = new byte[1];
 
-                UsbSetupPacket cmd = UsbCmdWriteTable;
-                byte[] addrBits = new byte[2];
-                addrBits[0] = (byte)addr;
-                bool allOK = false;
-                byte[] valBits = BitConverter.GetBytes(val);
-                for (byte i = 0; i < 8; i++)
+                UsbSetupPacket cmd = new UsbSetupPacket();
+
+                switch (type)
                 {
-                    addrBits[1] = i;
-                    cmd.Value = (short)BitConverter.ToInt16(addrBits, 0);
-                    cmd.Index = (short)valBits[i];
-                    bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
-                    allOK = bSuccess && lengthTransferred == 1;
+                    case USBSIM_TABLE_TYPES.TABLE:
+                        cmd = UsbCmdWriteTable;
+                        break;
+                    case USBSIM_TABLE_TYPES.TABLE2:
+                        cmd = UsbCmdWriteTable2;
+                        break;
+                    case USBSIM_TABLE_TYPES.TABLE_RAW:
+                        cmd = UsbCmdWriteTableRaw;
+                        break;
+                    case USBSIM_TABLE_TYPES.TABLE_RAW2:
+                        cmd = UsbCmdWriteTableRaw2;
+                        break;
+                    default:
+                        cmd.RequestType = UsbRequestType.RecipOther;
+                        break;
                 }
-                return allOK;
+
+                if (cmd.RequestType != UsbRequestType.RecipOther)
+                {
+
+                    byte[] addrBits = new byte[2];
+                    bool allOK = false;
+
+                    for (byte j = 0; j < 8; j++)
+                    {
+                        addrBits[0] = j;
+                        byte[] valBits = BitConverter.GetBytes(values[j]);
+                        for (byte i = 0; i < 8; i++)
+                        {
+                            addrBits[1] = i;
+                            cmd.Value = (short)BitConverter.ToInt16(addrBits, 0);
+                            cmd.Index = (short)valBits[i];
+                            bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
+                            allOK = bSuccess && lengthTransferred == 1;
+                        }
+                    }
+                    return allOK;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
                 return false;
             }
+        }
+
+        public bool writeTable(double[] vals)
+        {
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE, vals);
+        }
+
+        public bool writeTable2(double[] vals)
+        {
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE2, vals);
+        }
+
+        public bool writeTableRaw(double[] vals)
+        {
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW, vals);
+        }
+
+        public bool writeTableRaw2(double[] vals)
+        {
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW, vals);
         }
 
         internal static readonly UsbSetupPacket UsbCmdSet1 =
@@ -118,9 +261,9 @@ namespace usbSimInstrument
                                0,
                                0,
                                1);
-        internal static readonly UsbSetupPacket UsbCmdWriteTable =
+        internal static readonly UsbSetupPacket UsbCmdSet2 =
             new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE,
+                               (DeviceRequestType)USBSIM_COMMANDS.SET2,
                                0,
                                0,
                                1);
@@ -130,5 +273,49 @@ namespace usbSimInstrument
                                0,
                                0,
                                1);
+        internal static readonly UsbSetupPacket UsbCmdWriteTable =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE,
+                               0,
+                               0,
+                               1);
+        internal static readonly UsbSetupPacket UsbCmdReadTable2 =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE2,
+                               0,
+                               0,
+                               1);
+        internal static readonly UsbSetupPacket UsbCmdWriteTable2 =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE2,
+                               0,
+                               0,
+                               1);
+
+        internal static readonly UsbSetupPacket UsbCmdReadTableRaw =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE_RAW,
+                               0,
+                               0,
+                               1);
+        internal static readonly UsbSetupPacket UsbCmdWriteTableRaw =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE_RAW,
+                               0,
+                               0,
+                               1);
+        internal static readonly UsbSetupPacket UsbCmdReadTableRaw2 =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE_RAW2,
+                               0,
+                               0,
+                               1);
+        internal static readonly UsbSetupPacket UsbCmdWriteTableRaw2 =
+            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
+                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE_RAW2,
+                               0,
+                               0,
+                               1);
+        
     }
 }
