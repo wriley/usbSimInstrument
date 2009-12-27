@@ -58,7 +58,7 @@ namespace usbSimInstrument
 
         private bool SetHelper(byte pointer, int val)
         {
-            if (usbInstrumentDevice.Open())
+            if ((usbInstrumentDevice != null) && usbInstrumentDevice.Open())
             {
                 int lengthTransferred;
                 byte[] buf = new byte[1];
@@ -109,7 +109,7 @@ namespace usbSimInstrument
         {
             double[] table = new double[8];
 
-            if (usbInstrumentDevice.Open())
+            if ((usbInstrumentDevice != null) && usbInstrumentDevice.Open())
             {
                 int lengthTransferred;
                 byte[] buf = new byte[8];
@@ -177,7 +177,7 @@ namespace usbSimInstrument
 
         private bool WriteTableHelper(USBSIM_TABLE_TYPES type, double[] values)
         {
-            if (usbInstrumentDevice.Open())
+            if ((usbInstrumentDevice != null) && usbInstrumentDevice.Open())
             {
                 int lengthTransferred;
                 byte[] buf = new byte[1];
