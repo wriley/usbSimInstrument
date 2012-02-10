@@ -79,6 +79,8 @@ namespace Calibrator
             String[] pieces = cbDevices.SelectedItem.ToString().Split(' ');
             Instrument = new Instrument(pieces[0]);
             LoadTableValues();
+            Instrument.Set1(hScrollBarSet1_1.Value);
+            Instrument.Set2(hScrollBarSet2_1.Value);
         }
 
         private void LoadTableValues()
@@ -221,7 +223,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_1.Value);
+                Instrument.Set2(hScrollBarSet2_1.Value);
             }
         }
 
@@ -231,7 +233,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_2.Value);
+                Instrument.Set2(hScrollBarSet2_2.Value);
             }
         }
 
@@ -241,7 +243,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_3.Value);
+                Instrument.Set2(hScrollBarSet2_3.Value);
             }
         }
 
@@ -251,7 +253,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_4.Value);
+                Instrument.Set2(hScrollBarSet2_4.Value);
             }
         }
         private void hScrollBarSet2_5_Scroll(object sender, ScrollEventArgs e)
@@ -260,7 +262,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_5.Value);
+                Instrument.Set2(hScrollBarSet2_5.Value);
             }
         }
 
@@ -270,7 +272,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_6.Value);
+                Instrument.Set2(hScrollBarSet2_6.Value);
             }
         }
 
@@ -280,7 +282,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_7.Value);
+                Instrument.Set2(hScrollBarSet2_7.Value);
             }
         }
 
@@ -290,7 +292,7 @@ namespace Calibrator
 
             if (Instrument != null)
             {
-                Instrument.Set1(hScrollBarSet2_8.Value);
+                Instrument.Set2(hScrollBarSet2_8.Value);
             }
         }
 
@@ -301,6 +303,7 @@ namespace Calibrator
                 double[] table = new double[8];
                 double[] raw = new double[8];
 
+                // pointer 1
                 table[0] = double.Parse(textBoxSet1_1.Text.ToString());
                 raw[0] = double.Parse(hScrollBarSet1_1.Value.ToString());
 
@@ -327,6 +330,34 @@ namespace Calibrator
 
                 Instrument.writeTable(table);
                 Instrument.writeTableRaw(raw);
+
+                // pointer 2
+                table[0] = double.Parse(textBoxSet2_1.Text.ToString());
+                raw[0] = double.Parse(hScrollBarSet2_1.Value.ToString());
+
+                table[1] = double.Parse(textBoxSet2_2.Text.ToString());
+                raw[1] = double.Parse(hScrollBarSet2_2.Value.ToString());
+
+                table[2] = double.Parse(textBoxSet2_3.Text.ToString());
+                raw[2] = double.Parse(hScrollBarSet2_3.Value.ToString());
+
+                table[3] = double.Parse(textBoxSet2_4.Text.ToString());
+                raw[3] = double.Parse(hScrollBarSet2_4.Value.ToString());
+
+                table[4] = double.Parse(textBoxSet2_5.Text.ToString());
+                raw[4] = double.Parse(hScrollBarSet2_5.Value.ToString());
+
+                table[5] = double.Parse(textBoxSet2_6.Text.ToString());
+                raw[5] = double.Parse(hScrollBarSet2_6.Value.ToString());
+
+                table[6] = double.Parse(textBoxSet2_7.Text.ToString());
+                raw[6] = double.Parse(hScrollBarSet2_7.Value.ToString());
+
+                table[7] = double.Parse(textBoxSet2_8.Text.ToString());
+                raw[7] = double.Parse(hScrollBarSet2_8.Value.ToString());
+
+                Instrument.writeTable2(table);
+                Instrument.writeTableRaw2(raw);
             }
         }
 

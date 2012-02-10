@@ -252,7 +252,7 @@ namespace usbSimInstrument
 
         public bool writeTableRaw2(double[] vals)
         {
-            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW, vals);
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW2, vals);
         }
 
         internal static readonly UsbSetupPacket UsbCmdSet1 =
