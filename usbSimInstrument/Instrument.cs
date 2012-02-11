@@ -42,7 +42,7 @@ namespace usbSimInstrument
         public Instrument(String serial)
         {
             UsbDeviceFinder MyUsbFinder = new UsbDeviceFinder(VENDOR_ID, PRODUCT_ID, serial);
-            UsbRegistry MyUsbRegistry = UsbGlobals.AllDevices.Find(MyUsbFinder);
+            UsbRegistry MyUsbRegistry = UsbDevice.AllDevices.Find(MyUsbFinder);
             if (MyUsbRegistry == null)
             {
                 Debug.WriteLine(String.Format("Could not find device with serial {0}", serial));
@@ -73,11 +73,11 @@ namespace usbSimInstrument
                         cmd = UsbCmdSet2;
                         break;
                     default:
-                        cmd.RequestType = UsbRequestType.RecipOther;
+                        cmd.RequestType = (Byte)UsbRequestType.TypeReserved;
                         break;
                 }
 
-                if (cmd.RequestType != UsbRequestType.RecipOther)
+                if (cmd.RequestType != (Byte)UsbRequestType.TypeReserved)
                 {
 
                     cmd.Value = (short)val;
@@ -130,11 +130,11 @@ namespace usbSimInstrument
                         cmd = UsbCmdReadTableRaw2;
                         break;
                     default:
-                        cmd.RequestType = UsbRequestType.RecipOther;
+                        cmd.RequestType = (Byte)UsbRequestType.TypeReserved;
                         break;
                 }
 
-                if (cmd.RequestType != UsbRequestType.RecipOther)
+                if (cmd.RequestType != (Byte)UsbRequestType.TypeReserved)
                 {
 
                     for (short i = 0; i < 8; i++)
@@ -199,11 +199,11 @@ namespace usbSimInstrument
                         cmd = UsbCmdWriteTableRaw2;
                         break;
                     default:
-                        cmd.RequestType = UsbRequestType.RecipOther;
+                        cmd.RequestType = (Byte)UsbRequestType.TypeReserved;
                         break;
                 }
 
-                if (cmd.RequestType != UsbRequestType.RecipOther)
+                if (cmd.RequestType != (Byte)UsbRequestType.TypeReserved)
                 {
 
                     byte[] addrBits = new byte[2];
@@ -255,64 +255,73 @@ namespace usbSimInstrument
             return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW2, vals);
         }
 
+        /*
+        int transferred;
+                        byte[] ctrlData=new byte[1];
+                        UsbSetupPacket setTestTypePacket = 
+                            new UsbSetupPacket((byte) (UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                                0x0E,0x01,usbInterfaceInfo.Descriptor.InterfaceID,1);
+                        MyUsbDevice.ControlTransfer(ref setTestTypePacket,ctrlData, 1, out transferred);
+        */
+
         internal static readonly UsbSetupPacket UsbCmdSet1 =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET1,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET1,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdSet2 =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET2,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET2,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdReadTable =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.GET_TABLE,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdWriteTable =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET_TABLE,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdReadTable2 =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE2,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.GET_TABLE2,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdWriteTable2 =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE2,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET_TABLE2,
                                0,
                                0,
                                1);
 
         internal static readonly UsbSetupPacket UsbCmdReadTableRaw =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE_RAW,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.GET_TABLE_RAW,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdWriteTableRaw =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE_RAW,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET_TABLE_RAW,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdReadTableRaw2 =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.GET_TABLE_RAW2,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.GET_TABLE_RAW2,
                                0,
                                0,
                                1);
         internal static readonly UsbSetupPacket UsbCmdWriteTableRaw2 =
-            new UsbSetupPacket(UsbRequestType.EndpointIn | UsbRequestType.RecipDevice | UsbRequestType.TypeVendor,
-                               (DeviceRequestType)USBSIM_COMMANDS.SET_TABLE_RAW2,
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET_TABLE_RAW2,
                                0,
                                0,
                                1);

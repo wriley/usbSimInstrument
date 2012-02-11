@@ -18,7 +18,7 @@ namespace Calibrator
     public partial class frmMain : Form
     {
         private Instrument Instrument;
-        public static DeviceNotifier DeviceNotifier = new DeviceNotifier();
+        public static IDeviceNotifier UsbDeviceNotifier = DeviceNotifier.OpenDeviceNotifier();
 
         const int VENDOR_ID = 0x16C0;
         const int PRODUCT_ID = 0x05DC;
@@ -35,7 +35,7 @@ namespace Calibrator
             Instrument = null;
             
             UsbDeviceFinder MyUsbFinder = new UsbDeviceFinder(VENDOR_ID, PRODUCT_ID);
-            UsbRegDeviceList MyUsbRegDeviceList = UsbGlobals.AllDevices.FindAll(MyUsbFinder);
+            UsbRegDeviceList MyUsbRegDeviceList = UsbDevice.AllDevices.FindAll(MyUsbFinder);
 
             if (MyUsbRegDeviceList.Count > 0)
             {
@@ -53,7 +53,7 @@ namespace Calibrator
             textBoxPointer1Max.Text = hScrollBarSet1_1.Maximum.ToString();
             textBoxPointer2Min.Text = hScrollBarSet2_1.Minimum.ToString();
             textBoxPointer2Max.Text = hScrollBarSet2_1.Maximum.ToString();
-            DeviceNotifier.OnDeviceNotify += OnDeviceNotifyEvent;
+            UsbDeviceNotifier.OnDeviceNotify += OnDeviceNotifyEvent;
             FindDevices();
         }
 
