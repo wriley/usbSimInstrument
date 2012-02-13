@@ -107,6 +107,10 @@
             this.labelPointer2Min = new System.Windows.Forms.Label();
             this.textBoxPointer2Max = new System.Windows.Forms.TextBox();
             this.textBoxPointer2Min = new System.Windows.Forms.TextBox();
+            this.tbSerial = new System.Windows.Forms.TextBox();
+            this.btnSetSerial = new System.Windows.Forms.Button();
+            this.btnReset = new System.Windows.Forms.Button();
+            this.btnFindDevices = new System.Windows.Forms.Button();
             this.groupBoxPointer1.SuspendLayout();
             this.groupBoxPointer2.SuspendLayout();
             this.SuspendLayout();
@@ -881,11 +885,53 @@
             this.textBoxPointer2Min.Size = new System.Drawing.Size(51, 20);
             this.textBoxPointer2Min.TabIndex = 38;
             // 
+            // tbSerial
+            // 
+            this.tbSerial.Location = new System.Drawing.Point(589, 13);
+            this.tbSerial.Name = "tbSerial";
+            this.tbSerial.Size = new System.Drawing.Size(51, 20);
+            this.tbSerial.TabIndex = 32;
+            this.tbSerial.Text = "0";
+            // 
+            // btnSetSerial
+            // 
+            this.btnSetSerial.Location = new System.Drawing.Point(508, 10);
+            this.btnSetSerial.Name = "btnSetSerial";
+            this.btnSetSerial.Size = new System.Drawing.Size(75, 23);
+            this.btnSetSerial.TabIndex = 43;
+            this.btnSetSerial.Text = "Set Serial";
+            this.btnSetSerial.UseVisualStyleBackColor = true;
+            this.btnSetSerial.Click += new System.EventHandler(this.btnSetSerial_Click);
+            // 
+            // btnReset
+            // 
+            this.btnReset.Location = new System.Drawing.Point(404, 10);
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Size = new System.Drawing.Size(75, 23);
+            this.btnReset.TabIndex = 44;
+            this.btnReset.Text = "Send Reset";
+            this.btnReset.UseVisualStyleBackColor = true;
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            // 
+            // btnFindDevices
+            // 
+            this.btnFindDevices.Location = new System.Drawing.Point(287, 10);
+            this.btnFindDevices.Name = "btnFindDevices";
+            this.btnFindDevices.Size = new System.Drawing.Size(88, 23);
+            this.btnFindDevices.TabIndex = 45;
+            this.btnFindDevices.Text = "Find Devices";
+            this.btnFindDevices.UseVisualStyleBackColor = true;
+            this.btnFindDevices.Click += new System.EventHandler(this.btnFindDevices_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(654, 494);
+            this.Controls.Add(this.btnFindDevices);
+            this.Controls.Add(this.btnReset);
+            this.Controls.Add(this.btnSetSerial);
+            this.Controls.Add(this.tbSerial);
             this.Controls.Add(this.buttonPointer2MinMaxSet);
             this.Controls.Add(this.labelPointer2Max);
             this.Controls.Add(this.labelPointer2Min);
@@ -994,6 +1040,10 @@
         private System.Windows.Forms.Label labelPointer2Min;
         private System.Windows.Forms.TextBox textBoxPointer2Max;
         private System.Windows.Forms.TextBox textBoxPointer2Min;
+        private System.Windows.Forms.TextBox tbSerial;
+        private System.Windows.Forms.Button btnSetSerial;
+        private System.Windows.Forms.Button btnReset;
+        private System.Windows.Forms.Button btnFindDevices;
     }
 }
 

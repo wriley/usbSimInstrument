@@ -28,6 +28,7 @@ namespace usbSimInstrument
             SET_TABLE2 = 31,
             GET_TABLE_RAW2 = 40,
             SET_TABLE_RAW2 = 41,
+            SET_SERIAL = 90,
             RESET = 99,
         };
 
@@ -41,18 +42,31 @@ namespace usbSimInstrument
 
         public Instrument(String serial)
         {
-            UsbDeviceFinder MyUsbFinder = new UsbDeviceFinder(VENDOR_ID, PRODUCT_ID, serial);
-            UsbRegistry MyUsbRegistry = UsbDevice.AllDevices.Find(MyUsbFinder);
-            if (MyUsbRegistry == null)
+            UsbDeviceFinder MyUsbFinder = new UsbDeviceFinder(VENDOR_ID, PRODUCT_ID);
+            UsbRegDeviceList MyUsbRegDeviceList = UsbDevice.AllDevices.FindAll(MyUsbFinder);
+
+            if (MyUsbRegDeviceList.Count > 0)
             {
-                Debug.WriteLine(String.Format("Could not find device with serial {0}", serial));
+                foreach (UsbRegistry MyUsbRegistry in MyUsbRegDeviceList)
+                {
+                    if (MyUsbRegistry.Device.Info.SerialString == serial)
+                    {
+                        if (MyUsbRegistry.Open(out usbInstrumentDevice))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Debug.WriteLine(string.Format("Could not open device with serial {0}", serial));
+                        }
+                    }
+                }
+
+                Debug.WriteLine(string.Format("Could not find device with serial {0}", serial));
             }
             else
             {
-                if (!MyUsbRegistry.Open(out usbInstrumentDevice))
-                {
-                    Debug.WriteLine(string.Format("Could not open device with serial {0}", serial));
-                }
+                Debug.WriteLine("No devices found");
             }
         }
 
@@ -81,8 +95,7 @@ namespace usbSimInstrument
                 {
 
                     cmd.Value = (short)val;
-                    bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
-                    return bSuccess && lengthTransferred == 1;
+                    return usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
                 }
                 else
                 {
@@ -143,6 +156,7 @@ namespace usbSimInstrument
                         if (usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred))
                         {
                             table[i] = BitConverter.ToDouble(buf, 0);
+                            Debug.WriteLine(String.Format("ReadTable lengthTransferred = {0}", lengthTransferred));
                         }
                         else
                         {
@@ -219,6 +233,7 @@ namespace usbSimInstrument
                             cmd.Value = (short)BitConverter.ToInt16(addrBits, 0);
                             cmd.Index = (short)valBits[i];
                             bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
+                            Debug.WriteLine(String.Format("WriteTable lengthTransferred = {0}", lengthTransferred));
                             allOK = bSuccess && lengthTransferred == 1;
                         }
                     }
@@ -253,6 +268,50 @@ namespace usbSimInstrument
         public bool writeTableRaw2(double[] vals)
         {
             return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW2, vals);
+        }
+
+        private bool SetSerialHelper(Int16 val)
+        {
+            if ((usbInstrumentDevice != null) && usbInstrumentDevice.Open())
+            {
+                int lengthTransferred;
+                byte[] buf = new byte[3];
+                UsbSetupPacket cmd = UsbCmdSetSerial;
+                cmd.Value = (short)val;
+                
+                bool bSuccess = usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
+                Debug.WriteLine(String.Format("buf[0] => {0}\nbuf[1] => {1}\nbuf[2] => {2}", buf[0], buf[1], buf[2]));
+                return bSuccess;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool SetSerial(Int16 val)
+        {
+            return SetSerialHelper(val);
+        }
+
+        private bool ResetHelper()
+        {
+            if ((usbInstrumentDevice != null) && usbInstrumentDevice.Open())
+            {
+                int lengthTransferred;
+                byte[] buf = new byte[1];
+                UsbSetupPacket cmd = UsbCmdReset;
+                return usbInstrumentDevice.ControlTransfer(ref cmd, buf, buf.Length, out lengthTransferred);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Reset()
+        {
+            return ResetHelper();
         }
 
         /*
@@ -325,6 +384,17 @@ namespace usbSimInstrument
                                0,
                                0,
                                1);
-        
+        internal static readonly UsbSetupPacket UsbCmdSetSerial =
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.SET_SERIAL,
+                               0,
+                               0,
+                               1);
+        internal static readonly UsbSetupPacket UsbCmdReset =
+            new UsbSetupPacket((byte)(UsbCtrlFlags.Direction_In | UsbCtrlFlags.Recipient_Device | UsbCtrlFlags.RequestType_Vendor),
+                               (byte)USBSIM_COMMANDS.RESET,
+                               0,
+                               0,
+                               1);
     }
 }

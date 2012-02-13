@@ -30,6 +30,7 @@ namespace Calibrator
 
         private void FindDevices()
         {
+            cbDevices.SelectedIndex = -1;
             cbDevices.Items.Clear();
             cbDevices.Enabled = false;
             Instrument = null;
@@ -41,7 +42,7 @@ namespace Calibrator
             {
                 foreach (UsbRegistry MyUsbRegistry in MyUsbRegDeviceList)
                 {
-                    cbDevices.Items.Add(String.Format("{0} - {1}", MyUsbRegistry.Device.Info.SerialString.ToString(), MyUsbRegistry.Name));
+                    cbDevices.Items.Add(String.Format("{0} - {1}", MyUsbRegistry.Device.Info.SerialString, MyUsbRegistry.Name));
                 }
                 cbDevices.Enabled = true;
             }
@@ -76,11 +77,15 @@ namespace Calibrator
 
         private void cbDevices_SelectedIndexChanged(object sender, EventArgs e)
         {
-            String[] pieces = cbDevices.SelectedItem.ToString().Split(' ');
-            Instrument = new Instrument(pieces[0]);
-            LoadTableValues();
-            Instrument.Set1(hScrollBarSet1_1.Value);
-            Instrument.Set2(hScrollBarSet2_1.Value);
+            if (cbDevices.SelectedItem != null)
+            {
+                String[] pieces = cbDevices.SelectedItem.ToString().Split(' ');
+                Instrument = new Instrument(pieces[0]);
+                tbSerial.Text = pieces[0];
+                LoadTableValues();
+                Instrument.Set1(hScrollBarSet1_1.Value);
+                Instrument.Set2(hScrollBarSet2_1.Value);
+            }
         }
 
         private void LoadTableValues()
@@ -403,6 +408,40 @@ namespace Calibrator
             {
                 Debug.WriteLine("Exception: " + ex.Message);
             }
+        }
+
+        private void btnSetSerial_Click(object sender, EventArgs e)
+        {
+            if (Instrument != null)
+            {
+                try
+                {
+                    Int16 ser = Int16.Parse(tbSerial.Text);
+                    if (!Instrument.SetSerial(ser))
+                    {
+                        MessageBox.Show("Error setting serial");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(String.Format("{0} is not a valid integer", tbSerial.Text));
+                }
+
+                FindDevices();
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            if (Instrument != null)
+            {
+                Instrument.Reset();
+            }
+        }
+
+        private void btnFindDevices_Click(object sender, EventArgs e)
+        {
+            FindDevices();
         }
     }
 }
