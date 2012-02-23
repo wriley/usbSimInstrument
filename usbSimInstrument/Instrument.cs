@@ -34,8 +34,8 @@ namespace usbSimInstrument
 
         internal enum USBSIM_TABLE_TYPES
         {
-            TABLE,
-            TABLE_RAW,
+            TABLE1,
+            TABLE1_RAW,
             TABLE2,
             TABLE_RAW2,
         };
@@ -51,11 +51,7 @@ namespace usbSimInstrument
                 {
                     if (MyUsbRegistry.Device.Info.SerialString == serial)
                     {
-                        if (MyUsbRegistry.Open(out usbInstrumentDevice))
-                        {
-                            break;
-                        }
-                        else
+                        if (!MyUsbRegistry.Open(out usbInstrumentDevice))
                         {
                             Debug.WriteLine(string.Format("Could not open device with serial {0}", serial));
                         }
@@ -130,13 +126,13 @@ namespace usbSimInstrument
 
                 switch (type)
                 {
-                    case USBSIM_TABLE_TYPES.TABLE:
+                    case USBSIM_TABLE_TYPES.TABLE1:
                         cmd = UsbCmdReadTable;
                         break;
                     case USBSIM_TABLE_TYPES.TABLE2:
                         cmd = UsbCmdReadTable2;
                         break;
-                    case USBSIM_TABLE_TYPES.TABLE_RAW:
+                    case USBSIM_TABLE_TYPES.TABLE1_RAW:
                         cmd = UsbCmdReadTableRaw;
                         break;
                     case USBSIM_TABLE_TYPES.TABLE_RAW2:
@@ -171,7 +167,7 @@ namespace usbSimInstrument
 
         public double[] ReadTable()
         {
-            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE);
+            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE1);
         }
 
         public double[] ReadTable2()
@@ -181,7 +177,7 @@ namespace usbSimInstrument
 
         public double[] ReadTableRaw()
         {
-            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW);
+            return ReadTableHelper(USBSIM_TABLE_TYPES.TABLE1_RAW);
         }
 
         public double[] ReadTableRaw2()
@@ -200,13 +196,13 @@ namespace usbSimInstrument
 
                 switch (type)
                 {
-                    case USBSIM_TABLE_TYPES.TABLE:
+                    case USBSIM_TABLE_TYPES.TABLE1:
                         cmd = UsbCmdWriteTable;
                         break;
                     case USBSIM_TABLE_TYPES.TABLE2:
                         cmd = UsbCmdWriteTable2;
                         break;
-                    case USBSIM_TABLE_TYPES.TABLE_RAW:
+                    case USBSIM_TABLE_TYPES.TABLE1_RAW:
                         cmd = UsbCmdWriteTableRaw;
                         break;
                     case USBSIM_TABLE_TYPES.TABLE_RAW2:
@@ -252,7 +248,7 @@ namespace usbSimInstrument
 
         public bool writeTable(double[] vals)
         {
-            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE, vals);
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE1, vals);
         }
 
         public bool writeTable2(double[] vals)
@@ -262,7 +258,7 @@ namespace usbSimInstrument
 
         public bool writeTableRaw(double[] vals)
         {
-            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE_RAW, vals);
+            return WriteTableHelper(USBSIM_TABLE_TYPES.TABLE1_RAW, vals);
         }
 
         public bool writeTableRaw2(double[] vals)
