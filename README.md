@@ -1,7 +1,7 @@
 usbSimInstrument
 ================
 
-This is a half-finished project I started several years ago for a flight simulator panel. It is a DLL to drive a stepper board<sup>1</sup>. Each stepper board has a serial number and calibration values that can be set/edited with the Calibrator tool<sup>2</sup>.
+This is a half-finished project I started several years ago for a flight simulator panel. It is a DLL to drive a stepper board<sup>1</sup>. Each stepper board has a serial number and calibration values that can be set/edited with the Calibrator tool<sup>2</sup>. Micosoft Visual C# is required to compile.
 
 Relevant blog posts
 * http://workbench.freetcp.com/archives/549
