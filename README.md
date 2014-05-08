@@ -1,7 +1,7 @@
 usbSimInstrument
 ================
 
-This is a half-finished project I started several years ago for a flight simulator panel. It is a DLL to drive a stepper board<sup>1</sup>. Each stepper board has a serial number and calibration values that can be set/edited with the Calibrator tool.
+This is a half-finished project I started several years ago for a flight simulator panel. It is a DLL to drive a stepper board<sup>1</sup>. Each stepper board has a serial number and calibration values that can be set/edited with the Calibrator tool<sup>2</sup>.
 
 Relevant blog posts
 * http://workbench.freetcp.com/archives/549
@@ -13,3 +13,4 @@ Relevant blog posts
 References
 
 1. https://github.com/wriley/usbSimStepper
+2. http://workbench.freetcp.com/wp-content/uploads/2009/12/Calibrator.jpg
